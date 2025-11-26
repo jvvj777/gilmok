@@ -1,0 +1,18 @@
+x1:
+The community center planned a series of workshops to help residents learn new skills and connect with one another. Organizers invited local experts to teach topics ranging from financial planning to creative writing. Participants were encouraged to share their experiences, ask questions, and collaborate on small projects that would benefit the neighborhood.
+  
+y1:
+Bendruomenės centras suplanavo įvairių dirbtuvių ciklą, kad padėtų gyventojams įgyti naujų įgūdžių ir stiprinti tarpusavio ryšius. Organizatoriai pakvietė vietos specialistus pristatyti temas nuo finansinio planavimo iki kūrybinio rašymo. Dalyviai buvo skatinami dalytis patirtimi, užduoti klausimus ir bendradarbiauti mažuose projektuose, kurie prisidėtų prie rajono gerovės.
+  
+x2:
+When the research team began analyzing the collected data, they quickly noticed several unexpected trends. Some results contradicted earlier studies, while others revealed new patterns that had not been explored before. The team held multiple discussions to interpret the findings and determine which aspects required further investigation in future experiments.
+  
+y2:
+Kai tyrėjų komanda pradėjo analizuoti surinktus duomenis, jie greitai pastebėjo kelias netikėtas tendencijas. Kai kurie rezultatai prieštaravo ankstesniems tyrimams, o kiti atskleidė iki tol nenagrinėtus dėsningumus. Komanda surengė kelias diskusijas, siekdama interpretuoti išvadas ir nustatyti, kurie aspektai reikalauja gilesnio nagrinėjimo būsimiuose eksperimentuose.
+  
+x3:
+The historical society launched a preservation project aimed at documenting traditional crafts that were disappearing from the region. Volunteers interviewed artisans, recorded demonstrations, and photographed tools used in each craft. The goal was to create a comprehensive archive that schools, museums, and researchers could use to understand the area’s cultural heritage.
+
+y3:
+Istorinė draugija pradėjo išsaugojimo projektą, kurio tikslas buvo dokumentuoti tradicinius amatus, nykstančius šiame regione. Savanoriai kalbino amatininkus, filmavo jų demonstracijas ir fotografavo įrankius, naudojamus kiekviename amate. Tikslas buvo sukurti išsamų archyvą, kurį mokyklos, muziejai ir tyrėjai galėtų naudoti siekdami geriau suprasti regiono kultūrinį paveldą.
+
