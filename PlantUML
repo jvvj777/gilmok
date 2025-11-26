@@ -1,0 +1,174 @@
+PlantUML:
+
+' PlantUML file containing multiple diagrams for an English->Lithuanian generative-AI translation system
+' Diagrams included:
+' 1) System Context
+' 2) Component Diagram
+' 3) Sequence Diagram (translation flow)
+' 4) Deployment Diagram
+
+' ----------------------
+' 1) System Context
+' ----------------------
+@startuml Context
+title System Context — English → Lithuanian Translation (Generative AI)
+
+actor User as U
+actor Admin as A
+
+package "Translation Platform" {
+  [Web App / Mobile App] as Frontend
+  [API Gateway / Auth] as APIG
+  [Translation Service] as TS
+  database "Translation DB" as DB
+  node "Monitoring & Logging" as MON
+}
+
+rectangle "External AI Provider (Generative Model)" as AI
+
+U --> Frontend : Submit text (EN)
+Frontend --> APIG : REST/gRPC request
+APIG --> TS : Auth + Route request
+TS --> DB : Read/Write translation records
+TS --> AI : Call model (prompt + config)
+TS --> MON : Emit metrics & traces
+A --> MON : View metrics / alerts
+
+note right of AI
+  Could be: OpenAI / Anthropic / Self-hosted LLM
+  or an adapter to fine-tuned translation model
+end note
+
+@enduml
+
+' ----------------------
+' 2) Component Diagram
+' ----------------------
+@startuml Components
+title Component Diagram — Translation Service Internals
+
+package "Frontend" {
+  [UI (Browser / Mobile)] as UI
+  [Client SDK / JS] as SDK
+}
+
+package "API Layer" {
+  [API Gateway]
+  [Auth Service]
+  [Rate Limiter]
+}
+
+package "Translation Platform" {
+  [Controller / API Handler] as Controller
+  [Translation Orchestrator] as Orchestrator
+  [Prompt Builder & Post-processor] as PP
+  [Cache (Redis)] as Cache
+  [Task Queue (e.g. RabbitMQ / SQS)] as Queue
+  [Worker Pool] as Workers
+  [Model Adapter]
+  [Translation DB]
+  [Telemetry / Logging]
+}
+
+' Component relations
+UI --> SDK : calls
+SDK --> API Gateway : requests
+API Gateway --> Auth Service : validate token
+API Gateway --> Controller : forward request
+Controller --> Orchestrator : start translation
+Orchestrator --> Cache : check recent translations
+Orchestrator --> Queue : enqueue job (if async or heavy)
+Workers --> Queue : consume job
+Workers --> Model Adapter : invoke model
+Model Adapter --> Telemetry / Logging : log request/latency
+Model Adapter --> Cache : save result for reuse
+Model Adapter --> Translation DB : persist records
+PP <-- Model Adapter : raw model output
+Orchestrator --> PP : post-process, quality checks
+Controller --> UI : return translated text
+
+note left of Model Adapter
+  - Handles retries, rate limits, batching
+  - Supports multiple providers/fallbacks
+end note
+
+@enduml
+
+' ----------------------
+' 3) Sequence Diagram
+' ----------------------
+@startuml Sequence
+title Sequence — Synchronous translation request
+actor User
+participant "Frontend" as FE
+participant "API Gateway" as AG
+participant "Auth Service" as AUTH
+participant "Controller / Orchestrator" as ORC
+participant "Cache (Redis)" as CACHE
+participant "Model Adapter" as ADP
+participant "Translation DB" as DB
+participant "Telemetry" as TEL
+
+User -> FE : Enter English text + request translate
+FE -> AG : POST /translate {text, user, options}
+AG -> AUTH : verify token
+AUTH --> AG : token valid
+AG -> ORC : /translate request
+ORC -> CACHE : lookup(text hash)
+alt cache hit
+  CACHE --> ORC : cached translation (LT)
+else cache miss
+  ORC -> ADP : build prompt & call model
+  ADP -> TEL : emit request metric
+  ADP -> ADP : call external model API
+  ADP --> ORC : model response (raw)
+  ORC -> ORC : post-process (clean, normalize)
+  ORC -> DB : persist translation record
+  ORC -> CACHE : store translation
+end
+ORC --> AG : 200 OK {translated_text}
+AG --> FE : 200 OK {translated_text}
+FE --> User : display Lithuanian text
+
+@enduml
+
+' ----------------------
+' 4) Deployment Diagram
+' ----------------------
+@startuml Deployment
+title Deployment — Cloud topology (example)
+
+node "User Devices" as UD
+node "Edge / CDN" as CDN
+node "Load Balancer" as LB
+
+node "App Cluster (k8s)" {
+  component "Frontend Pods" as FP
+  component "API Pods" as AP
+  component "Worker Pods" as WP
+}
+
+database "Primary DB (Postgres)" as PG
+database "Cache (Redis)" as RD
+node "Message Queue (SQS / RabbitMQ)" as MQ
+node "Observability" as OBS
+
+artifact "External Model Provider" as EXT
+
+UD --> CDN : fetch UI assets
+CDN --> LB : forward requests
+LB --> FP : serve frontend
+LB --> AP : API traffic
+AP --> AUTH : token validation
+AP --> MQ : enqueue heavy jobs
+WP --> MQ : consume jobs
+WP --> EXT : call model APIs
+EXT --> WP : model responses
+AP --> PG : read/write
+WP --> RD : cache reads/writes
+OBS --> AP : scrape metrics
+OBS --> WP : scrape metrics
+
+note "Scaling: horizontal for API & Workers; autoscale by CPU/queue length" as N
+
+@enduml
