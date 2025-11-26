@@ -53,9 +53,9 @@ package "Frontend" {
 }
 
 package "API Layer" {
-  [API Gateway]
-  [Auth Service]
-  [Rate Limiter]
+  [API Gateway] as APIGW
+  [Auth Service] as AuthService
+  [Rate Limiter] as RateLimiter
 }
 
 package "Translation Platform" {
@@ -65,29 +65,29 @@ package "Translation Platform" {
   [Cache (Redis)] as Cache
   [Task Queue (e.g. RabbitMQ / SQS)] as Queue
   [Worker Pool] as Workers
-  [Model Adapter]
-  [Translation DB]
-  [Telemetry / Logging]
+  [Model Adapter] as ModelAdapter
+  [Translation DB] as TranslationDB
+  [Telemetry / Logging] as Telemetry
 }
 
 ' Component relations
 UI --> SDK : calls
-SDK --> API Gateway : requests
-API Gateway --> Auth Service : validate token
-API Gateway --> Controller : forward request
+SDK --> APIGW : requests
+APIGW --> AuthService : validate token
+APIGW --> Controller : forward request
 Controller --> Orchestrator : start translation
 Orchestrator --> Cache : check recent translations
 Orchestrator --> Queue : enqueue job (if async or heavy)
 Workers --> Queue : consume job
-Workers --> Model Adapter : invoke model
-Model Adapter --> Telemetry / Logging : log request/latency
-Model Adapter --> Cache : save result for reuse
-Model Adapter --> Translation DB : persist records
-PP <-- Model Adapter : raw model output
+Workers --> ModelAdapter : invoke model
+ModelAdapter --> Telemetry : log request/latency
+ModelAdapter --> Cache : save result for reuse
+ModelAdapter --> TranslationDB : persist records
+PP <-- ModelAdapter : raw model output
 Orchestrator --> PP : post-process, quality checks
 Controller --> UI : return translated text
 
-note left of Model Adapter
+note left of ModelAdapter
   - Handles retries, rate limits, batching
   - Supports multiple providers/fallbacks
 end note
